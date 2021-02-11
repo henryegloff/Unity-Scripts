@@ -2,7 +2,7 @@
 
 ## Simple Player Controller
 
-Adds basic physics controlls to a player object. Force or velocity can be applied based the directions of a camera target object (see Simple Camera Controller).
+Adds basic physics controls to a player object. Force or velocity can be applied based the directions of a camera target object (see Simple Camera Controller).
 
 ## Simple Camera Controller
 
