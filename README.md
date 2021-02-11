@@ -6,4 +6,4 @@ Adds basic physics controlls to a player object. Force or velocity can be applie
 
 ## Simple Camera Controller
 
-Follows a camera target that is aligns with the position of the player object. 
+Follows a camera target that is aligns with the position of the player object. This is useful if the player object has rotations that you don't want to apply to the camera.
