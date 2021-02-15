@@ -4,58 +4,74 @@ using UnityEngine;
 
 public class BasicPlayerController : MonoBehaviour
 {
-    /* 
-    create a variable called 'rb' that will represent the 
-    rigid body of this object
+
+	/* 
+    Create a variable called 'rb' that will represent the 
+    rigid body of this object.
     */
     private Rigidbody rb;
-
+    
+    // Create a public variable for the cameraTarget object
+    public GameObject cameraTarget;
     /* 
     You will need to set the cameraTarget object in Unity. 
     The direction this object is facing will be used to determine
-    the direction of forces we will apply to our player
+    the direction of forces we will apply to our player.
     */
-    
-    public GameObject cameraTarget;
-    
-    
+
+    public float movementIntensity;
+    /* 
+    Creates a public variable that will be used to set 
+    the movement intensity (from within Unity)
+    */
+
+
     void Start()
     {
-        // make our rb variable equal the rigid body component
+    	// make our rb variable equal the rigid body component
         rb = GetComponent<Rigidbody>();
     }
 
-
+ 
     void Update()
     {
+    	/* 
+    	Establish some directions 
+    	based on the cameraTarget object's orientation 
+    	*/
+        var ForwardDirection = cameraTarget.transform.forward;
+        var RightDirection = cameraTarget.transform.right;
 
-        var cameraForward = cameraTarget.transform.forward;
-        var cameraRight = cameraTarget.transform.right;
-        var cameraUp = cameraTarget.transform.up;
 
-        if (Input.GetKey(KeyCode.I)) 
+        // Move Forwards
+        if (Input.GetKey(KeyCode.W)) 
         {
-            //rb.AddForce (cameraForward * 1, ForceMode.Impulse);
-            //rb.AddForce (cameraForward * 5);
-            rb.velocity = cameraForward * 5;
+            rb.AddForce (ForwardDirection * movementIntensity);
+
+            /* You may want to try using velocity rather than force.
+            This allows for a more responsive control of the movement
+            possibly better suited to first person controls, eg: */
+
+            //rb.velocity = ForwardDirection * movementIntensity;
         }
 
-        if (Input.GetKey(KeyCode.K))
+        // Move Backwards
+        if (Input.GetKey(KeyCode.S))
         {
-            //rb.AddForce (-cameraForward * 5);
-            rb.velocity = -cameraForward * 5;
+        	// Adding a negative to the direction reverses it
+            rb.AddForce (-ForwardDirection * movementIntensity);
         }
 
-        if (Input.GetKey(KeyCode.J))
+        // Move Rightwards (eg Strafe. *We are using A & D to swivel)
+        if (Input.GetKey(KeyCode.E))
         {
-           //rb.AddForce (-cameraRight * 5);
-           rb.velocity = -cameraRight * 5;
+           rb.AddForce (RightDirection * movementIntensity);
         }
 
-        if (Input.GetKey(KeyCode.L))
+        // Move Leftwards
+        if (Input.GetKey(KeyCode.Q))
         {
-           //rb.AddForce (cameraRight * 5);
-           rb.velocity = cameraRight * 5;
+           rb.AddForce (-RightDirection * movementIntensity);
         }
     }
 }
