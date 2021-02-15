@@ -5,7 +5,7 @@ using UnityEngine;
 public class ExtendedPlayerController : MonoBehaviour
 {
 
-    private Rigidbody rb;
+	private Rigidbody rb;
     /* 
     Creates a variable called 'rb' that will represent the 
     rigid body of this object.
@@ -64,7 +64,7 @@ public class ExtendedPlayerController : MonoBehaviour
         {
             //rb.AddForce (ForwardDirection * movementIntensity);
 
-            /* This example velocity rather than force.
+            /* This example uses velocity rather than force.
             This allows for a more responsive control of the movement
             possibly better suited to first person controls, eg: */
 
@@ -102,7 +102,6 @@ public class ExtendedPlayerController : MonoBehaviour
         when the space key is pressed.
         */
 
-        }
 
         // jump
         if(Input.GetKeyDown(KeyCode.X))
@@ -112,7 +111,8 @@ public class ExtendedPlayerController : MonoBehaviour
         }
 
 
-    	
+        }
+	
     }
 
     void shootProjectile()
