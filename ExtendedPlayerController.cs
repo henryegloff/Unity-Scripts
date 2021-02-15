@@ -5,7 +5,7 @@ using UnityEngine;
 public class ExtendedPlayerController : MonoBehaviour
 {
 
-	private Rigidbody rb;
+    private Rigidbody rb;
     /* 
     Creates a variable called 'rb' that will represent the 
     rigid body of this object.
