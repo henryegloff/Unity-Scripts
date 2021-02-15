@@ -127,6 +127,8 @@ public class ExtendedPlayerController : MonoBehaviour
         clone.GetComponent<Rigidbody>().AddForce(ForwardDirection * 600);
         clone.GetComponent<Rigidbody>().AddForce(UpDirection * 200);
         clone.GetComponent<Rigidbody>().AddTorque(RightDirection * 200);
+	
+	Destroy(clone, 5.0f); // Destroy the clone after 5 seconds
 
     }
 
