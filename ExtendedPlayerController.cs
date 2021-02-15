@@ -51,47 +51,58 @@ public class ExtendedPlayerController : MonoBehaviour
         if (isGrounded) 
         {
 
-        /* 
-        Establish some directions 
-        based on the cameraTargets orientation 
-        */
-        var ForwardDirection = cameraTarget.transform.forward;
-        var RightDirection = cameraTarget.transform.right;
+            /* 
+            Establish some directions 
+            based on the cameraTargets orientation 
+            */
+            var ForwardDirection = cameraTarget.transform.forward;
+            var RightDirection = cameraTarget.transform.right;
 
 
-        // Move Forwards
-        if (Input.GetKey(KeyCode.W)) 
-        {
-            //rb.AddForce (ForwardDirection * movementIntensity);
+            // Move Forwards
+            if (Input.GetKey(KeyCode.W)) 
+            {
+                //rb.AddForce (ForwardDirection * movementIntensity);
 
-            /* This example uses velocity rather than force.
-            This allows for a more responsive control of the movement
-            possibly better suited to first person controls, eg: */
+                /* This example uses velocity rather than force.
+                This allows for a more responsive control of the movement
+                possibly better suited to first person controls, eg: */
 
-            rb.velocity = ForwardDirection * movementIntensity;
-        }
+                rb.velocity = ForwardDirection * movementIntensity;
+            }
 
-        // Move Backwards
-        if (Input.GetKey(KeyCode.S))
-        {
-            // Adding a negative to the direction reverses it
-            //rb.AddForce (-ForwardDirection * movementIntensity);
-            rb.velocity = -ForwardDirection * movementIntensity;
-        }
+            // Move Backwards
+            if (Input.GetKey(KeyCode.S))
+            {
+                // Adding a negative to the direction reverses it
+                //rb.AddForce (-ForwardDirection * movementIntensity);
+                rb.velocity = -ForwardDirection * movementIntensity;
+            }
 
-        // Move Rightwards (eg Strafe. *We are using A & D to swivel)
-        if (Input.GetKey(KeyCode.E))
-        {
-           //rb.AddForce (RightDirection * movementIntensity);
-           rb.velocity = RightDirection * movementIntensity;
-        }
+            // Move Rightwards (eg Strafe. *We are using A & D to swivel)
+            if (Input.GetKey(KeyCode.E))
+            {
+               //rb.AddForce (RightDirection * movementIntensity);
+               rb.velocity = RightDirection * movementIntensity;
+            }
 
-        // Move Leftwards
-        if (Input.GetKey(KeyCode.Q))
-        {
-           //rb.AddForce (-RightDirection * movementIntensity);
-           rb.velocity = -RightDirection * movementIntensity;
-        }
+            // Move Leftwards
+            if (Input.GetKey(KeyCode.Q))
+            {
+               //rb.AddForce (-RightDirection * movementIntensity);
+               rb.velocity = -RightDirection * movementIntensity;
+            }
+
+            
+            // jump
+            if(Input.GetKeyDown(KeyCode.X))
+            {
+                rb.AddForce(jump * jumpForce, ForceMode.Impulse);
+                isGrounded = false;
+            }
+
+
+        } // closes the isGrounded condition
 
         // shoot
         if (Input.GetKeyDown(KeyCode.Space)) {
@@ -101,17 +112,6 @@ public class ExtendedPlayerController : MonoBehaviour
         Calls a 'shootProjectile' function
         when the space key is pressed.
         */
-
-
-        // jump
-        if(Input.GetKeyDown(KeyCode.X))
-        {
-            rb.AddForce(jump * jumpForce, ForceMode.Impulse);
-            isGrounded = false;
-        }
-
-
-        }
 	
     }
 
