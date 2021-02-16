@@ -2,7 +2,7 @@
 
 ## Basic Player Controller
 
-Adds basic physics controls to a player object. Uses the direction of a camera target object (that the camera is parented to) to determine the direction that force or velocity can be applied to the player object (see Simple Camera Controller).
+Adds basic physics controls to a player object. Uses the direction of a camera target object (that the camera is parented to) to determine the direction that force or velocity can be applied to the player object (see Camera Controller).
 
 ## Camera Controller
 
