@@ -7,6 +7,7 @@ public class TrackObject : MonoBehaviour
 
     private Rigidbody rb;
     public Transform target; // The object that will be tracked
+    public float movementSpeed = 0.25f;
 	
     void Start()
     {
@@ -16,6 +17,6 @@ public class TrackObject : MonoBehaviour
     void Update()
     {
         transform.LookAt(target);
-        //rb.AddForce(transform.forward * 1); // Apply forwards force to move the object towards the target
+        rb.AddForce(transform.forward * movementSpeed); // Moves the object towards the target
     }
 }
