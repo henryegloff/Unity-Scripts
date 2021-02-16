@@ -17,6 +17,6 @@ public class TrackObject : MonoBehaviour
     void Update()
     {
         transform.LookAt(target);
-        rb.AddForce(transform.forward * movementSpeed); // Moves the object towards the target
+        //rb.AddForce(transform.forward * movementSpeed); // Moves the object towards the target
     }
 }
