@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TrackPlayer : MonoBehaviour
+public class TrackObject : MonoBehaviour
 {
 
     private Rigidbody rb;
-    public Transform target;
+    public Transform target; // The object that will be tracked
 	
     void Start()
     {
@@ -16,6 +16,6 @@ public class TrackPlayer : MonoBehaviour
     void Update()
     {
         transform.LookAt(target);
-        rb.AddForce(transform.forward * 1);
+        //rb.AddForce(transform.forward * 1); // Apply forwards force to move the object towards the target
     }
 }
