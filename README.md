@@ -1,4 +1,4 @@
-# Unity-Scripts
+# Unity Scripts
 
 ## Basic Player Controller
 
