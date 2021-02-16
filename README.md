@@ -12,6 +12,6 @@ Follows a camera target that follows the position of the player object, but not 
 
 Extends the basic player controller by adding the ability to jump and move only when the player object is grounded. Also adds the ability to shoot projectiles in the direction that the player object is facing.
 
-## Track Object
+## Track Object Position
 
 Makes a rigid body object constantly turns to face a 'target' object (such as the player). Can also be used to make the rigid body move towards the position of the target object. 
