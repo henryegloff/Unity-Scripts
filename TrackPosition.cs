@@ -5,11 +5,11 @@ using UnityEngine;
 public class TrackPosition : MonoBehaviour
 {
     /* 
-	  This script updates the position of the current object
+    This script updates the position of the current object
     to the position of the target object
     */
 
-    public Transform target;
+    public Transform target; // Set this in the inspector
 
     void Update()
     {
