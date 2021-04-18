@@ -9,7 +9,6 @@ using UnityEngine.EventSystems;
 public class GameSystem : MonoBehaviour
 {
 
-
     // Game System
 	public static GameSystem gameSystem;
 
@@ -18,28 +17,27 @@ public class GameSystem : MonoBehaviour
 	public static bool audioEnabled = true;
 	public static bool controlsEnabled = true;
 	public static bool startScreen = true;
+    public static bool levelActive = false;
 
-    // Animators
+    // Screen Animators
 	public Animator screenBackgroundAnimator;
 	public Animator startScreenAnimator;
     public Animator startScreenBackground;
 	public Animator pauseScreenAnimator;
 	public Animator levelScreenAnimator;
+    public Animator levelCompletedScreenAnimator;
     public Animator controlsAnimator;
-    public Animator toggleControlsAnimator;
 
-    // UI Elements
-    public Text scoreUI;
-    public Text topScoreUI;
+    // General UI Elements
+    public Text levelUI;
     public Text timeUI;
     public Text fastestTimeUI;
     public Text energyUI;
-    public Text levelUI;
 
-    // Audio Button
-    public GameObject AudioButton;
-    public Sprite AudioSpriteOn;
-    public Sprite AudioSpriteOff;
+    // End Level Elements
+    public Text levelCompletedUI;
+    public Text levelCompletedTimeUI;
+    public Text levelCompletedFastestTimeUI;
 
     // Timer
     public static TimeSpan timePlaying;
@@ -48,15 +46,18 @@ public class GameSystem : MonoBehaviour
 
     // Game Values
     public static float energy = 100;
-    public static int score = 0;
 
+    // Level Time Records (as array)
+    public static TimeSpan [] levelRecords;
+    //public static TimeSpan currentLevelRecord;
+   
+  
     /* 
-
-    All level soundtracks are set to play on awake
+    Level soundtracks are set to play on awake
     When a level resets it turns the volume on or off 
     depending on the boolean value of 'audioEnabled'
-
     */
+
 
 
     void Start()
@@ -66,84 +67,106 @@ public class GameSystem : MonoBehaviour
         // Initial Start Screen
         if(startScreen)
         {
-            Time.timeScale = 0f;
+            /* 
+            Define the amount of items in the 'records' array based on the 
+            amount of scenes in the build
+            */
+            levelRecords = new TimeSpan [SceneManager.sceneCountInBuildSettings];
+            //print ("Scene Count: " + SceneManager.sceneCountInBuildSettings);
 
+            Time.timeScale = 0f;
             screenBackgroundAnimator.SetBool("Start", true);
             startScreenBackground.SetBool("StartBackground", true);
             startScreenAnimator.SetBool("Active", true);
+
+            // Controls on by default
             controlsAnimator.SetBool("Active", true);
-            toggleControlsAnimator.SetBool("Active", true);
-            AudioButton.GetComponent<Image>().sprite = AudioSpriteOn;
+
             startScreen = false; 
             /* 
-            Once the game has "started" we won't see the start screen
-            again when we replay or load new levels etc
+            Once the game has "started" we don't want the start screen to
+            automatically load for each new level
             */
+
         } else {       
 
             Time.timeScale = 1;
             gamePaused = false;
             AudioListener.volume = 1f;
             GameSystem.energy = 100;
-            GameSystem.score = 0;
+
             BeginTimer(); 
+            levelActive = true;
 
             if(controlsEnabled)
             {
                 controlsAnimator.SetBool("Active", true);
-                toggleControlsAnimator.SetBool("Active", true);
             }
 
             if(!audioEnabled)
             {
                 AudioListener.volume = 0f; 
-                AudioButton.GetComponent<Image>().sprite = AudioSpriteOff;
             }
+
+            /*
+            Add the fastest time record to the UI
+            if there is an actual fastest time recorded greater than 00:00:00
+            */
+
+            if (levelRecords[SceneManager.GetActiveScene().buildIndex] > TimeSpan.FromSeconds(1)) {
+                fastestTimeUI.text = "Fastest Time: " + levelRecords[SceneManager.GetActiveScene().buildIndex].ToString("mm':'ss'.'ff");
+            }
+
         }
     }
 
+ 
 
 
     void Update()
     {   
-        if (Input.GetKeyUp(KeyCode.Escape))
+
+        if (levelActive) // Only when level is being played
         {
-           TogglePause();
+            // Toggle Pause
+            if (Input.GetKeyUp(KeyCode.Escape))
+            {
+               TogglePause();
+            }
+
+            //Test level complete *** Comment out in final build
+            if (Input.GetKeyUp(KeyCode.Y))
+            {
+               LevelCompleted();
+            }
         }
 
-        // Test energy
+        // Test energy *** Comment out in final build
         if (Input.GetKeyUp(KeyCode.RightBracket))
         {
-           energy += 1;
+           energy += 10;
         }
         if (Input.GetKeyUp(KeyCode.LeftBracket))
         {
-           energy -= 1;
+           energy -= 10;
         }
 
-        // Test score
-        if (Input.GetKeyUp(KeyCode.Y))
-        {
-           score += 1;
-        }
-        if (Input.GetKeyUp(KeyCode.T))
-        {
-           score -= 1;
-        }
+    
 
 
+        // Energy Out
         if (energy < 1)
         {
-           RestartLevel();
+           GameOver();
         }
 
         // Update UI
-        levelUI.text = SceneManager.GetActiveScene().name;
-        scoreUI.text = "Score: " + score.ToString();
-        energyUI.text = energy.ToString()+"%";
-        
-        
+        if (energy < 100)
+        {
+           energyUI.text = energy.ToString()+"%";
+        }
 
+        levelUI.text = SceneManager.GetActiveScene().name;
     }
 
 
@@ -157,6 +180,7 @@ public class GameSystem : MonoBehaviour
         gamePaused = false;
         timerGoing = true;
         BeginTimer();
+        levelActive = true;
     }
 
 
@@ -172,11 +196,10 @@ public class GameSystem : MonoBehaviour
         StartCoroutine(UpdateTimer());
     }
 
-    public void EndTime()
-    {
-        timerGoing = false;
-        Debug.Log("Timer Ended");
-    }
+    // public void EndTime()
+    // {
+    //     timerGoing = false;
+    // }
 
     private IEnumerator UpdateTimer()
     {
@@ -184,7 +207,7 @@ public class GameSystem : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             timePlaying = TimeSpan.FromSeconds(elapsedTime);
-            string timePlayingStr= "Time: " + timePlaying.ToString("mm':'ss'.'ff");
+            string timePlayingStr = timePlaying.ToString("mm':'ss'.'ff");
             timeUI.text = timePlayingStr;
             yield return null;
         }
@@ -201,17 +224,12 @@ public class GameSystem : MonoBehaviour
         if(!audioEnabled)
         {
             AudioListener.volume = 1f; 
-            AudioButton.GetComponent<Image>().sprite = AudioSpriteOn;
-
         }
         else
         {
-            AudioListener.volume = 0f;
-            AudioButton.GetComponent<Image>().sprite = AudioSpriteOff;
-            
+            AudioListener.volume = 0f; 
         }
         audioEnabled = !audioEnabled;
-        Debug.Log("Toggled Audio Enabled = " + audioEnabled);
     }
 
 
@@ -220,21 +238,18 @@ public class GameSystem : MonoBehaviour
         if(!controlsEnabled)
         {
             controlsAnimator.SetBool("Active", true);
-            toggleControlsAnimator.SetBool("Active", true);
         }
         else
         {
             controlsAnimator.SetBool("Active", false);
-            toggleControlsAnimator.SetBool("Active", false);
         }
         controlsEnabled = !controlsEnabled;
-        Debug.Log("Toggled Controls Enabled = " + controlsEnabled);
     }
 
 
     public void TogglePause()
     {
-        if(gamePaused == false)
+        if(!gamePaused)
         {
             pauseScreenAnimator.SetBool("Active", true);
             screenBackgroundAnimator.SetBool("Active", true);
@@ -249,6 +264,7 @@ public class GameSystem : MonoBehaviour
             pauseScreenAnimator.SetBool("Active", false);
             levelScreenAnimator.SetBool("Active", false);
             startScreenAnimator.SetBool("Active", false);
+            startScreenBackground.SetBool("StartBackground", false);
             Time.timeScale = 1;
             gamePaused = false;
             timerGoing = true;
@@ -259,7 +275,7 @@ public class GameSystem : MonoBehaviour
 
 
 
-    /* Levels & Quit
+    /* Levels
     -------------------------------*/
 
     public void RestartLevel()
@@ -273,24 +289,139 @@ public class GameSystem : MonoBehaviour
     {
     	pauseScreenAnimator.SetBool("Active", false);
     	startScreenAnimator.SetBool("Active", false);
+        levelCompletedScreenAnimator.SetBool("Active", false);
+
     	levelScreenAnimator.SetBool("Active", true);
+    }
+
+    public void CancelLevelSelection()
+    {
+        startScreenBackground.SetBool("StartBackground", false);
+        screenBackgroundAnimator.SetBool("Start", false);
+        TogglePause();
+        levelActive = true;
+    }
+
+    public void BackFromLevelSelection()
+    {
+        if (!levelActive) {
+            screenBackgroundAnimator.SetBool("Start", true);
+            startScreenBackground.SetBool("StartBackground", true);
+            startScreenAnimator.SetBool("Active", true);
+        }
+
+        else if (gamePaused) {
+            pauseScreenAnimator.SetBool("Active", true);
+            screenBackgroundAnimator.SetBool("Active", true);
+        }
+        levelScreenAnimator.SetBool("Active", false);
     }
 
     public void LoadLevel()
     {
-        var buttonName = EventSystem.current.currentSelectedGameObject.name;
+        var levelName = EventSystem.current.currentSelectedGameObject.name;
         /* 
         Gets the name of button clicked 
         (the button name needs to match the name of scene to be loaded)
         */
         levelScreenAnimator.SetBool("Active", false);
-        SceneManager.LoadScene(buttonName);
+
+        SceneManager.LoadScene(levelName);
+
+        //currentLevel = levelName;
+        //Debug.Log("Current Level = " + levelName);
+
         Start(); 
     }
 
+
+
+
+
+
+    /* Level Completed
+    -------------------------------*/
+
+    public void LevelCompleted()
+    {
+
+        levelCompletedScreenAnimator.SetBool("Active", true);
+        screenBackgroundAnimator.SetBool("Active", true);
+        Time.timeScale = 0f;
+        gamePaused = true;
+        timerGoing = false;
+
+
+        var currentLevelIndex = SceneManager.GetActiveScene().buildIndex;
+        var currentLevelNumber = currentLevelIndex + 1;
+        Debug.Log("Current Level Number = " + currentLevelNumber);
+
+
+        /* 
+        Get the record (from the records array)
+        that corresponds to the current level (remember first is 0)
+        */
+
+        var currentLevelRecord = levelRecords[currentLevelIndex];
+        Debug.Log("Current Level Record = " + currentLevelRecord);
+
+
+        var currentLevelTime = timePlaying;
+        Debug.Log("Time Playing = " + timePlaying);
+
+
+        // Update Screen Text
+        levelCompletedUI.text = "Level " + currentLevelNumber + " Completed";
+        levelCompletedTimeUI.text = "Time: " + timePlaying.ToString("mm':'ss'.'ff");
+
+
+        if (currentLevelRecord < TimeSpan.FromSeconds(1)) { // First level play when current record = 00:00:00
+
+            levelCompletedFastestTimeUI.text = "Record set: " + timePlaying.ToString("mm':'ss'.'ff");
+            levelRecords[currentLevelIndex] = timePlaying;
+            fastestTimeUI.text = "Fastest time: " + timePlaying.ToString("mm':'ss'.'ff");
+
+        }
+
+        else if (timePlaying < currentLevelRecord) {  // New record
+
+            levelCompletedFastestTimeUI.text = "New record! (Old Record: " + currentLevelRecord.ToString("mm':'ss'.'ff") + ")";
+            levelRecords[currentLevelIndex] = timePlaying;
+            fastestTimeUI.text = "Fastest time: " + timePlaying.ToString("mm':'ss'.'ff");
+
+        } 
+
+        else {
+
+            levelCompletedFastestTimeUI.text = "Current Record: " + currentLevelRecord.ToString("mm':'ss'.'ff");
+        }
+
+    }
+
+
+
+
+
+    /* Game Over
+    -------------------------------*/
+
+    public void GameOver()
+    {
+        Time.timeScale = 0f;
+        timerGoing = false;
+        screenBackgroundAnimator.SetBool("Start", true);
+        startScreenBackground.SetBool("StartBackground", true);
+        startScreenAnimator.SetBool("Active", true);
+    }
+
+
+
+    /* Quit
+    -------------------------------*/
+
     public void Quit()
     {
-    	UnityEditor.EditorApplication.isPlaying = false; // * Remove for final build
+    	UnityEditor.EditorApplication.isPlaying = false; // *** Remove in final build
     	Application.Quit();
     }
 
