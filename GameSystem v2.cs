@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+
 public class GameSystem : MonoBehaviour
 {
 
@@ -302,6 +303,7 @@ public class GameSystem : MonoBehaviour
     levelActive = true;
   }
 
+  // I ended up removing the buttons and not using this...
   public void BackFromLevelSelection()
   {
     if (!levelActive) {
@@ -409,14 +411,11 @@ public class GameSystem : MonoBehaviour
     timerGoing = false;
 
     var currentLevelRecord = levelRecords[SceneManager.GetActiveScene().buildIndex];
-
     gameOverCompletedTimeUI.text = "Time: " + timePlaying.ToString("mm':'ss'.'ff");
     
-
     if (levelRecords[SceneManager.GetActiveScene().buildIndex] < TimeSpan.FromSeconds(1)) {
       gameOverFastestTimeUI.text = "Fastest Time: not recorded";
     }
-
     else {
       gameOverFastestTimeUI.text = "Current Record: " + currentLevelRecord.ToString("mm':'ss'.'ff");
     }
