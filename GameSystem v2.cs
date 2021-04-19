@@ -26,6 +26,7 @@ public class GameSystem : MonoBehaviour
   public Animator pauseScreenAnimator;
   public Animator levelScreenAnimator;
   public Animator levelCompletedScreenAnimator;
+  public Animator gameOverScreenAnimator;
   public Animator controlsAnimator;
 
   // General UI Elements
@@ -39,6 +40,10 @@ public class GameSystem : MonoBehaviour
   public Text levelCompletedTimeUI;
   public Text levelCompletedFastestTimeUI;
 
+  // Game Over Elements
+  public Text gameOverCompletedTimeUI;
+  public Text gameOverFastestTimeUI;
+
   // Timer
   public static TimeSpan timePlaying;
   public static bool timerGoing;
@@ -47,17 +52,14 @@ public class GameSystem : MonoBehaviour
   // Game Values
   public static float energy = 100;
 
-  // Level Time Records (as array)
+  // Level Time Records (array)
   public static TimeSpan [] levelRecords;
-  //public static TimeSpan currentLevelRecord;
-   
   
   /* 
   Level soundtracks are set to play on awake
   When a level resets it turns the volume on or off 
   depending on the boolean value of 'audioEnabled'
   */
-
 
 
   void Start()
@@ -72,7 +74,6 @@ public class GameSystem : MonoBehaviour
       amount of scenes in the build
       */
       levelRecords = new TimeSpan [SceneManager.sceneCountInBuildSettings];
-      //print ("Scene Count: " + SceneManager.sceneCountInBuildSettings);
 
       Time.timeScale = 0f;
       screenBackgroundAnimator.SetBool("Start", true);
@@ -109,8 +110,7 @@ public class GameSystem : MonoBehaviour
       }
 
       /*
-      Add the fastest time record to the UI
-      if there is an actual fastest time recorded greater than 00:00:00
+      Add the fastest time record to the UI if there is a record greater than the default 00:00:00
       */
 
       if (levelRecords[SceneManager.GetActiveScene().buildIndex] > TimeSpan.FromSeconds(1)) {
@@ -131,39 +131,43 @@ public class GameSystem : MonoBehaviour
       // Toggle Pause
       if (Input.GetKeyUp(KeyCode.Escape))
       {
-         TogglePause();
+        TogglePause();
       }
 
       //Test level complete *** Comment out in final build
       if (Input.GetKeyUp(KeyCode.Y))
       {
-         LevelCompleted();
+        LevelCompleted();
       }
-    }
 
-    // Test energy *** Comment out in final build
-    if (Input.GetKeyUp(KeyCode.RightBracket))
-    {
-       energy += 10;
-    }
-    if (Input.GetKeyUp(KeyCode.LeftBracket))
-    {
-       energy -= 10;
-    }
+      //Test game over *** Comment out in final build
+      if (Input.GetKeyUp(KeyCode.T))
+      {
+        GameOver();
+      }
 
-  
+      // Test energy *** Comment out in final build
+      if (Input.GetKeyUp(KeyCode.RightBracket))
+      {
+        energy += 10;
+      }
+      if (Input.GetKeyUp(KeyCode.LeftBracket))
+      {
+        energy -= 10;
+      }
 
-
-    // Energy Out
-    if (energy < 1)
-    {
-       GameOver();
     }
 
     // Update UI
     if (energy < 100)
     {
-       energyUI.text = energy.ToString()+"%";
+      energyUI.text = energy.ToString()+"%";
+    }
+
+    // Energy Out
+    if (energy < 1)
+    {
+      GameOver();
     }
 
     levelUI.text = SceneManager.GetActiveScene().name;
@@ -195,11 +199,6 @@ public class GameSystem : MonoBehaviour
     elapsedTime = 0f;
     StartCoroutine(UpdateTimer());
   }
-
-  // public void EndTime()
-  // {
-  //     timerGoing = false;
-  // }
 
   private IEnumerator UpdateTimer()
   {
@@ -264,6 +263,7 @@ public class GameSystem : MonoBehaviour
       pauseScreenAnimator.SetBool("Active", false);
       levelScreenAnimator.SetBool("Active", false);
       startScreenAnimator.SetBool("Active", false);
+      gameOverScreenAnimator.SetBool("Active", false);
       startScreenBackground.SetBool("StartBackground", false);
       Time.timeScale = 1;
       gamePaused = false;
@@ -322,14 +322,11 @@ public class GameSystem : MonoBehaviour
     var levelName = EventSystem.current.currentSelectedGameObject.name;
     /* 
     Gets the name of button clicked 
-    (the button name needs to match the name of scene to be loaded)
+    The button name needs to match the name of scene to be loaded
     */
+
     levelScreenAnimator.SetBool("Active", false);
-
     SceneManager.LoadScene(levelName);
-
-    //currentLevel = levelName;
-    //Debug.Log("Current Level = " + levelName);
 
     Start(); 
   }
@@ -358,13 +355,12 @@ public class GameSystem : MonoBehaviour
 
 
     /* 
-    Get the record (from the records array)
-    that corresponds to the current level (remember first is 0)
+    Get the record from the records array
+    that corresponds to the current level/scene in build (remember first is 0)
     */
 
     var currentLevelRecord = levelRecords[currentLevelIndex];
     Debug.Log("Current Level Record = " + currentLevelRecord);
-
 
     var currentLevelTime = timePlaying;
     Debug.Log("Time Playing = " + timePlaying);
@@ -392,7 +388,6 @@ public class GameSystem : MonoBehaviour
     } 
 
     else {
-
       levelCompletedFastestTimeUI.text = "Current Record: " + currentLevelRecord.ToString("mm':'ss'.'ff");
     }
 
@@ -407,11 +402,25 @@ public class GameSystem : MonoBehaviour
 
   public void GameOver()
   {
+    gameOverScreenAnimator.SetBool("Active", true);
+    screenBackgroundAnimator.SetBool("Active", true);
     Time.timeScale = 0f;
+    gamePaused = true;
     timerGoing = false;
-    screenBackgroundAnimator.SetBool("Start", true);
-    startScreenBackground.SetBool("StartBackground", true);
-    startScreenAnimator.SetBool("Active", true);
+
+    var currentLevelRecord = levelRecords[SceneManager.GetActiveScene().buildIndex];
+
+    gameOverCompletedTimeUI.text = "Time: " + timePlaying.ToString("mm':'ss'.'ff");
+    
+
+    if (levelRecords[SceneManager.GetActiveScene().buildIndex] < TimeSpan.FromSeconds(1)) {
+      gameOverFastestTimeUI.text = "Fastest Time: not recorded";
+    }
+
+    else {
+      gameOverFastestTimeUI.text = "Current Record: " + currentLevelRecord.ToString("mm':'ss'.'ff");
+    }
+
   }
 
 
