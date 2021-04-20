@@ -18,7 +18,8 @@ public class GameSystem : MonoBehaviour
 
     public Text fastestTimeUI;
     public Text timeUI;
-
+    public Text gameOverTimeUI;
+    public Text gameOverTimeDetailsUI;
 
     // Timer
     public static TimeSpan timePlaying;
@@ -29,9 +30,6 @@ public class GameSystem : MonoBehaviour
     public Animator startScreenAnimator;
     public Animator pauseScreenAnimator;
     public Animator gameOverScreenAnimator;
-
-
-    // public Text fastestTimeUI;
 
 
     void Start()
@@ -49,37 +47,33 @@ public class GameSystem : MonoBehaviour
             BeginTimer();
             gamePaused = false;
             levelActive = true;
+
+            if (levelRecord > TimeSpan.FromSeconds(1))
+            {
+                fastestTimeUI.text = "Fastest Time: " + levelRecord.ToString("mm':'ss'.'ff");
+            }
+
         }
     }
 
     void Update()
     {
-        
-            if (levelActive) // Only when level is being played
-            {
-              // Toggle Pause
-              if (Input.GetKeyUp(KeyCode.Escape))
+        if (levelActive) // Only when level is being played
+        {
+            // Toggle Pause
+            if (Input.GetKeyUp(KeyCode.Escape))
               {
                 TogglePause();
-
                 Debug.Log("Pause Toggled");
-
-
               }
 
             //Test level complete *** Comment out in final build
-              if (Input.GetKeyUp(KeyCode.Y))
-              {
+            if (Input.GetKeyUp(KeyCode.Y))
+            {
                 GameOver();
-              }
-
-
-          }
-        
+            }
+        } 
     }
-
-
-
 
     public void PlayGame() 
     {
@@ -89,7 +83,6 @@ public class GameSystem : MonoBehaviour
         levelActive = true;
         gamePaused = false;
     }
-
 
     public void BeginTimer() 
     {
@@ -109,8 +102,6 @@ public class GameSystem : MonoBehaviour
             yield return null;
         }
     }
-
-
 
     public void TogglePause() 
     {
@@ -142,7 +133,7 @@ public class GameSystem : MonoBehaviour
 
     public void Quit() 
     {
-        UnityEditor.EditorApplication.isPlaying = false; // *** Remove in final build
+        //UnityEditor.EditorApplication.isPlaying = false; // *** Remove in final build
         Application.Quit();
     }
 
@@ -152,9 +143,26 @@ public class GameSystem : MonoBehaviour
         Time.timeScale = 0f;
         gamePaused = true;
         timerGoing = false;
+        gameOverTimeUI.text = "Time: " + timePlaying.ToString("mm':'ss'.'ff");
+
+        if (levelRecord < TimeSpan.FromSeconds(1))
+        {
+            gameOverTimeDetailsUI.text = "Record set: " + timePlaying.ToString("mm':'ss'.'ff");
+            levelRecord = timePlaying;
+            fastestTimeUI.text = "Fastest time: " + timePlaying.ToString("mm':'ss'.'ff");
+        }
+
+        else if (timePlaying < levelRecord) // New record
+        {  
+            gameOverTimeDetailsUI.text = "New record! (Old Record: " + levelRecord.ToString("mm':'ss'.'ff") + ")";
+            levelRecord = timePlaying;
+            fastestTimeUI.text = "Fastest time: " + timePlaying.ToString("mm':'ss'.'ff");
+        }
+
+        else
+        {
+            gameOverTimeDetailsUI.text = "Current Record: " + levelRecord.ToString("mm':'ss'.'ff");
+        }
     }
-
     
-
-
 }
